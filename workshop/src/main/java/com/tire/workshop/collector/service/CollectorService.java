@@ -1,27 +1,30 @@
 package com.tire.workshop.collector.service;
 
-import com.tire.workshop.Domain;
-import com.tire.workshop.london.LondonServiceInterface;
-import com.tire.workshop.manchester.ManchesterServiceInterface;
+import com.tire.workshop.collector.AvailableTime;
+import com.tire.workshop.collector.Domain;
+import com.tire.workshop.collector.WorkshopCollectorInterface;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import java.util.Collection;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class CollectorService {
 
-    private final LondonServiceInterface londonServiceInterface;
-    private final ManchesterServiceInterface manchesterServiceInterface;
+    private final List<WorkshopCollectorInterface> workshops;
 
-
-    private final int amount = 20;
-    private final int page = 2;
-
-    public Domain getAllAvailableTimes(String from, String until) {
+    public Domain getAllAvailableTimes(String from, String until, String workshopName) {
         Domain domain = new Domain();
 
-        domain.setLondonAvailableTimeList(londonServiceInterface.getTireChangeTimes(from, until).getLondonAvailableTimeList());
-        domain.setManchesterAvailableTimeList(manchesterServiceInterface.getTireChangeTimes(amount, page, from).getManchesterAvailableTimeList());
+        List<AvailableTime> availableTimesList = workshops.stream()
+                //.filter(workshop -> Objects.equals(workshop.getWorkshops().get(0).getName(), workshopName))
+                .map(workshop -> workshop.getTireChangeTimes(from, until))
+                .flatMap(Collection::stream)
+                .toList();
+
+        domain.setAvailableTimes(availableTimesList);
 
         return domain;
     }

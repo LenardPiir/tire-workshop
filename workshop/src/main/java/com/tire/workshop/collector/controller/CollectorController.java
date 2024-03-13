@@ -1,6 +1,6 @@
 package com.tire.workshop.collector.controller;
 
-import com.tire.workshop.Domain;
+import com.tire.workshop.collector.Domain;
 import com.tire.workshop.collector.service.CollectorService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,7 +17,8 @@ public class CollectorController {
 
     @GetMapping("/available-times")
     public Domain getAllAvailableTimes(@RequestParam String from,
-                                       @RequestParam String until) {
-        return collectorService.getAllAvailableTimes(from, until);
+                                       @RequestParam String until,
+                                        @RequestParam String workshopName) {
+        return collectorService.getAllAvailableTimes(from, until, workshopName);
     }
 }

@@ -1,7 +1,9 @@
 package com.tire.workshop.london.service;
 
-import com.tire.workshop.Domain;
-import com.tire.workshop.london.LondonServiceInterface;
+import com.tire.workshop.collector.AvailableTime;
+import com.tire.workshop.collector.VehicleType;
+import com.tire.workshop.collector.Workshop;
+import com.tire.workshop.london.LondonServiceWorkshopInterface;
 import com.tire.workshop.london.data.TireChangeBookingResponse;
 import com.tire.workshop.london.data.TireChangeTimesResponse;
 import lombok.RequiredArgsConstructor;
@@ -13,15 +15,17 @@ import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Service("LondonService")
 @RequiredArgsConstructor
-public class TireChangeService implements LondonServiceInterface {
+public class TireChangeService implements LondonServiceWorkshopInterface {
 
     private final WebClient webClient;
 
-    public Domain getTireChangeTimes(String from, String until) {
+    public List<AvailableTime> getTireChangeTimes(String from, String until) {
         TireChangeTimesResponse tireChangeTimesResponse = webClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path("available")
@@ -33,14 +37,29 @@ public class TireChangeService implements LondonServiceInterface {
                 .retrieve()
                 .bodyToMono(TireChangeTimesResponse.class).block();
 
-        assert tireChangeTimesResponse != null;
-        return mapToDomain(tireChangeTimesResponse);
+        return tireChangeTimesResponse.getAvailableTime()
+                .stream()
+                .map(availableTime -> AvailableTime
+                        .builder()
+                        .availableTimeId(availableTime.getUuid().toString())
+                        .time(availableTime.getTime())
+                        .workshop(getWorkshop())
+                        .build())
+                .toList();
     }
 
-    private static Domain mapToDomain(TireChangeTimesResponse tireChangeTimesResponse) {
-        Domain domain = new Domain();
-        domain.setLondonAvailableTimeList(tireChangeTimesResponse.getAvailableTime());
-        return domain;
+    private static Workshop getWorkshop() {
+        // TODO: on application start read data from a file
+        Workshop workshop = new Workshop();
+        workshop.setName("London");
+        workshop.setAddress("1A Gunton Rd, London");
+
+        List<VehicleType> vehicleTypes = new ArrayList<>();
+        vehicleTypes.add(VehicleType.SOIDUAUTO);
+
+        workshop.setVehicleType(vehicleTypes);
+
+        return workshop;
     }
 
     public Mono<TireChangeBookingResponse> bookTireChangeTime(UUID uuid, String contactInformation) {
