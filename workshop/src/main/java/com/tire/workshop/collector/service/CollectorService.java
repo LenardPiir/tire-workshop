@@ -19,6 +19,7 @@ public class CollectorService {
         Domain domain = new Domain();
 
         List<AvailableTime> availableTimesList = workshops.stream()
+                // TODO: filter by workshop based on user input?
                 //.filter(workshop -> Objects.equals(workshop.getWorkshops().get(0).getName(), workshopName))
                 .map(workshop -> workshop.getTireChangeTimes(from, until))
                 .flatMap(Collection::stream)
