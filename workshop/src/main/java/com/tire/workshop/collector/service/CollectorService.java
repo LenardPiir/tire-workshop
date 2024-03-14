@@ -15,7 +15,7 @@ public class CollectorService {
 
     private final List<WorkshopCollectorInterface> workshops;
 
-    public Domain getAllAvailableTimes(String from, String until, String workshopName) {
+    public Domain getAllAvailableTimes(String from, String until) {
         Domain domain = new Domain();
 
         List<AvailableTime> availableTimesList = workshops.stream()

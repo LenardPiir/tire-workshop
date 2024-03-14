@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/workshops")
+@RequestMapping("/workshop-api")
 @RequiredArgsConstructor
 public class CollectorController {
 
@@ -17,8 +17,7 @@ public class CollectorController {
 
     @GetMapping("/available-times")
     public Domain getAllAvailableTimes(@RequestParam String from,
-                                       @RequestParam String until,
-                                        @RequestParam String workshopName) {
-        return collectorService.getAllAvailableTimes(from, until, workshopName);
+                                       @RequestParam String until) {
+        return collectorService.getAllAvailableTimes(from, until);
     }
 }
