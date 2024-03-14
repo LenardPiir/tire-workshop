@@ -7,6 +7,7 @@ import com.tire.workshop.manchester.ManchesterServiceWorkshopInterface;
 import com.tire.workshop.manchester.data.TireChangeTime;
 import com.tire.workshop.manchester.data.TireChangeTimeResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;
@@ -18,12 +19,16 @@ import java.util.Objects;
 @Service("ManchesterService")
 @RequiredArgsConstructor
 public class TireChangeService implements ManchesterServiceWorkshopInterface {
+
+    @Value("${manchester-service-url}")
+    private String url;
+
     public List<AvailableTime> getTireChangeTimes(String from, String until) {
         // TODO: refactor
         int amount = 10;
         int page = 2;
 
-        WebClient webClient = WebClient.create("http://localhost:9004/api/v2/tire-change-times");
+        WebClient webClient = WebClient.create(url);
 
         Flux<TireChangeTime> tireChangeTime = webClient.get()
                 .uri(uriBuilder -> uriBuilder
