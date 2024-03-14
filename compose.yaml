@@ -35,6 +35,16 @@ services:
     volumes:
       - ./web/nginx.conf:/etc/nginx/conf.d/default.conf:ro
 
+  manchester-tire-workshop:
+    image: surmus/manchester-tire-workshop:2.0.1
+    networks:
+      task:
+
+  london-tire-workshop:
+    image: surmus/london-tire-workshop:2.0.1
+    networks:
+      task:
+
 networks:
   task:
     driver: bridge
