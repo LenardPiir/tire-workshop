@@ -1,4 +1,4 @@
-package com.tire.workshop.collector;
+package com.tire.workshop.collector.domain;
 
 public enum VehicleType {
     SOIDUAUTO,

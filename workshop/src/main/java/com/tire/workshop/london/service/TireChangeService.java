@@ -1,8 +1,8 @@
 package com.tire.workshop.london.service;
 
-import com.tire.workshop.collector.AvailableTime;
-import com.tire.workshop.collector.VehicleType;
-import com.tire.workshop.collector.Workshop;
+import com.tire.workshop.collector.domain.AvailableTime;
+import com.tire.workshop.collector.domain.VehicleType;
+import com.tire.workshop.collector.domain.Workshop;
 import com.tire.workshop.london.LondonServiceWorkshopInterface;
 import com.tire.workshop.london.data.TireChangeBookingResponse;
 import com.tire.workshop.london.data.TireChangeTimesResponse;

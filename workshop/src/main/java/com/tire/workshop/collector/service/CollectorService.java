@@ -1,8 +1,8 @@
 package com.tire.workshop.collector.service;
 
-import com.tire.workshop.collector.AvailableTime;
-import com.tire.workshop.collector.Domain;
 import com.tire.workshop.collector.WorkshopCollectorInterface;
+import com.tire.workshop.collector.domain.AvailableTime;
+import com.tire.workshop.collector.domain.Domain;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -15,12 +15,13 @@ public class CollectorService {
 
     private final List<WorkshopCollectorInterface> workshops;
 
-    public Domain getAllAvailableTimes(String from, String until) {
+    public Domain getAvailableTimes(String from, String until, List<String> workshopNames, List<String> vehicleTypes) {
         Domain domain = new Domain();
 
         List<AvailableTime> availableTimesList = workshops.stream()
-                // TODO: filter by workshop based on user input?
-                //.filter(workshop -> Objects.equals(workshop.getWorkshops().get(0).getName(), workshopName))
+                .filter(workshop -> !workshop.getTireChangeTimes(from, until)
+                        .stream()
+                        .filter(workshop1 -> workshopNames.contains(workshop1.getWorkshop().getName())).toList().isEmpty())
                 .map(workshop -> workshop.getTireChangeTimes(from, until))
                 .flatMap(Collection::stream)
                 .toList();

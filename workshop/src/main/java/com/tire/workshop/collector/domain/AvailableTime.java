@@ -1,4 +1,4 @@
-package com.tire.workshop.collector;
+package com.tire.workshop.collector.domain;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
