@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -34,6 +35,23 @@ public class CollectorService {
                 .toList();
 
         domain.setAvailableTimes(availableTimesList);
+
+        return domain;
+    }
+
+    public Domain bookTireChangeTime(AvailableTime availableTime) {
+        List<AvailableTime> availableTimeList = workshops
+                .stream()
+                .filter(workshop -> !workshop.getWorkshops()
+                        .stream()
+                        .filter(workshopChild -> Objects.equals(availableTime.getWorkshop().getName(), workshopChild.getName()))
+                        .toList().isEmpty())
+                .toList()
+                .stream().map(workshopChild -> workshopChild.bookTireChangeTime(availableTime))
+                .toList();
+
+        Domain domain = new Domain();
+        domain.setAvailableTime(availableTimeList.get(0));
 
         return domain;
     }

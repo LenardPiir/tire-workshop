@@ -9,5 +9,6 @@ import java.util.List;
 @NoArgsConstructor
 public class Domain {
     private List<AvailableTime> availableTimes;
+    private AvailableTime availableTime;
 }
 

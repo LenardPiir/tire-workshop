@@ -1,5 +1,7 @@
 package com.tire.workshop.manchester.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.tire.workshop.collector.domain.AvailableTime;
 import com.tire.workshop.collector.domain.VehicleType;
 import com.tire.workshop.collector.domain.Workshop;
@@ -14,7 +16,6 @@ import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriBuilder;
 import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,6 +35,7 @@ public class TireChangeService implements ManchesterServiceWorkshopInterface {
 
         WebClient webClient = WebClient.create(url);
 
+        // TODO: add onError?
         Flux<TireChangeTime> tireChangeTime = webClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .queryParam("amount", amount)
@@ -64,6 +66,12 @@ public class TireChangeService implements ManchesterServiceWorkshopInterface {
                 .toList();
     }
 
+    public List<Workshop> getWorkshops() {
+        List<Workshop> workshopList = new ArrayList<>();
+        workshopList.add(getWorkshop());
+        return workshopList;
+    }
+
     private static Workshop getWorkshop() {
         // TODO: on application start read data from a file
         Workshop workshop = new Workshop();
@@ -83,16 +91,26 @@ public class TireChangeService implements ManchesterServiceWorkshopInterface {
         return workshop;
     }
 
-    public Mono<TireChangeTime> bookTireChangeTime(int id, String contactInformation) {
-        WebClient webClient = WebClient.create("http://localhost:9004/api/v2/tire-change-times/" + id + "/booking");
+    public AvailableTime bookTireChangeTime(AvailableTime availableTime) {
+        // TODO: Use solution universally
+        ObjectMapper mapper = new ObjectMapper();
+        ObjectNode contactInformation = mapper.createObjectNode();
+        contactInformation.put("contactInformation", availableTime.getContactInformation());
 
-        return webClient.post()
+        WebClient webClient = WebClient.create(url + "/" + availableTime.getAvailableTimeId() + "/booking");
+
+        TireChangeTime tireChangeTime = webClient.post()
                 .uri(UriBuilder::build)
                 .body(BodyInserters.fromValue(contactInformation))
                 .retrieve()
                 .onStatus(
                         HttpStatus.UNPROCESSABLE_ENTITY::equals,
                         response -> response.bodyToMono(String.class).map(Exception::new))
-                .bodyToMono(TireChangeTime.class);
+                .bodyToMono(TireChangeTime.class).block();
+
+        return new AvailableTime(String.valueOf(tireChangeTime.getId()),
+                availableTime.getTime(),
+                availableTime.getWorkshop(),
+                availableTime.getContactInformation());
     }
 }

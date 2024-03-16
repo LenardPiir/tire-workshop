@@ -11,4 +11,5 @@ public class AvailableTime {
     private String availableTimeId;
     private String time;
     private Workshop workshop;
+    private String contactInformation;
 }

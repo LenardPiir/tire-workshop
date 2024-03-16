@@ -13,11 +13,9 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
-import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 @Service("LondonService")
 @RequiredArgsConstructor
@@ -48,6 +46,12 @@ public class TireChangeService implements LondonServiceWorkshopInterface {
                 .toList();
     }
 
+    public List<Workshop> getWorkshops() {
+        List<Workshop> workshopList = new ArrayList<>();
+        workshopList.add(getWorkshop());
+        return workshopList;
+    }
+
     private static Workshop getWorkshop() {
         // TODO: on application start read data from a file
         Workshop workshop = new Workshop();
@@ -66,19 +70,24 @@ public class TireChangeService implements LondonServiceWorkshopInterface {
         return workshop;
     }
 
-    public Mono<TireChangeBookingResponse> bookTireChangeTime(UUID uuid, String contactInformation) {
-        return webClient.put()
+    public AvailableTime bookTireChangeTime(AvailableTime availableTime) {
+        TireChangeBookingResponse tireChangeBookingResponse = webClient.put()
                 .uri(uriBuilder -> uriBuilder
-                        .path(String.valueOf(uuid))
+                        .path(String.valueOf(availableTime.getAvailableTimeId()))
                         .path("/booking")
                         .build())
-                .body(BodyInserters.fromValue(contactInformation))
+                .body(BodyInserters.fromValue(availableTime.getContactInformation()))
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_XML_VALUE)
                 .accept(MediaType.APPLICATION_XML)
                 .retrieve()
                 .onStatus(
                         HttpStatus.UNPROCESSABLE_ENTITY::equals,
                         response -> response.bodyToMono(String.class).map(Exception::new))
-                .bodyToMono(TireChangeBookingResponse.class);
+                .bodyToMono(TireChangeBookingResponse.class).block();
+
+        return new AvailableTime(String.valueOf(tireChangeBookingResponse.getUuid()),
+                availableTime.getTime(),
+                availableTime.getWorkshop(),
+                availableTime.getContactInformation());
     }
 }

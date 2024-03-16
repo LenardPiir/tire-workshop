@@ -1,12 +1,10 @@
 package com.tire.workshop.collector.controller;
 
+import com.tire.workshop.collector.domain.AvailableTime;
 import com.tire.workshop.collector.domain.Domain;
 import com.tire.workshop.collector.service.CollectorService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -23,5 +21,10 @@ public class CollectorController {
                                        @RequestParam List<String> workshopNames,
                                        @RequestParam List<String> vehicleTypes) {
         return collectorService.getAvailableTimes(from, until, workshopNames, vehicleTypes);
+    }
+
+    @PostMapping("/book-time")
+    public @ResponseBody Domain bookTime(@RequestBody AvailableTime availableTime) {
+        return collectorService.bookTireChangeTime(availableTime);
     }
 }
