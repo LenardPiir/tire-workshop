@@ -9,7 +9,8 @@ import {
     MenuItem,
     OutlinedInput,
     Select,
-    SelectChangeEvent, Snackbar,
+    SelectChangeEvent,
+    Snackbar,
     Theme,
     Typography,
     useTheme
@@ -129,10 +130,15 @@ export default function BookingComponent() {
     }
 
     const submitForm = (selectedTime: any) => {
-        bookTime(selectedTime).then((response) => {
+        const availableTime: AvailableTime = {
+            availableTimeId: selectedTime.availableTimeId,
+            time: selectedTime.time,
+            workshop: selectedTime.workshop
+        }
 
+        bookTime(availableTime).then((response) => {
+            setOpen(true);
         });
-        setOpen(true);
     }
 
     const handleClose = (event?: React.SyntheticEvent | Event, reason?: string) => {
@@ -281,7 +287,7 @@ export default function BookingComponent() {
                             variant="filled"
                             sx={{ width: '100%' }}
                         >
-                            This is a success Alert inside a Snackbar!
+                            Selected time has been booked.
                         </Alert>
                     </Snackbar>
 

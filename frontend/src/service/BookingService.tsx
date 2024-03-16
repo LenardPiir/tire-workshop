@@ -8,5 +8,5 @@ export const getAvailableTimes = (from: any, until: any, workshopName: any, vehi
 }
 
 export const bookTime = (selectedTime: AvailableTime) => {
-    return axios.post(baseURL + '/book-time/' + selectedTime);
+    return axios.post(baseURL + '/book-time', selectedTime);
 }
