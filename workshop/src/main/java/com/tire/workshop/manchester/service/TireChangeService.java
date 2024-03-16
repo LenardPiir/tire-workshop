@@ -71,8 +71,12 @@ public class TireChangeService implements ManchesterServiceWorkshopInterface {
         workshop.setAddress("14 Bury New Rd, Manchester");
 
         List<VehicleType> vehicleTypes = new ArrayList<>();
-        vehicleTypes.add(VehicleType.SOIDUAUTO);
-        vehicleTypes.add(VehicleType.VEOAUTO);
+
+        VehicleType vehicleType = new VehicleType();
+        vehicleType.setType("Sõiduauto");
+        vehicleType.setType("Veoauto");
+
+        vehicleTypes.add(vehicleType);
 
         workshop.setVehicleType(vehicleTypes);
 

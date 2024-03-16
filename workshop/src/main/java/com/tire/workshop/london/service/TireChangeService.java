@@ -55,7 +55,11 @@ public class TireChangeService implements LondonServiceWorkshopInterface {
         workshop.setAddress("1A Gunton Rd, London");
 
         List<VehicleType> vehicleTypes = new ArrayList<>();
-        vehicleTypes.add(VehicleType.SOIDUAUTO);
+
+        VehicleType vehicleType = new VehicleType();
+        vehicleType.setType("Sõiduauto");
+
+        vehicleTypes.add(vehicleType);
 
         workshop.setVehicleType(vehicleTypes);
 

@@ -1,6 +1,10 @@
 package com.tire.workshop.collector.domain;
 
-public enum VehicleType {
-    SOIDUAUTO,
-    VEOAUTO
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
+public class VehicleType {
+    private String type;
 }
