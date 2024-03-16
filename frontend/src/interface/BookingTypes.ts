@@ -1,7 +1,8 @@
 export interface AvailableTime {
     availableTimeId: string,
     time: string,
-    workshop: Workshop[]
+    workshop: Workshop[],
+    contactInformation: string;
 }
 
 export interface Workshop {
@@ -12,4 +13,9 @@ export interface Workshop {
 
 export interface VehicleType {
     type: string;
+}
+
+export interface Domain {
+    availableTimes: AvailableTime[],
+    availableTime: AvailableTime
 }

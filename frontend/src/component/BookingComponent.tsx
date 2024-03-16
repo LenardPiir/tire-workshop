@@ -133,7 +133,9 @@ export default function BookingComponent() {
         const availableTime: AvailableTime = {
             availableTimeId: selectedTime.availableTimeId,
             time: selectedTime.time,
-            workshop: selectedTime.workshop
+            workshop: selectedTime.workshop,
+            // TODO: add field contact information to form
+            contactInformation: "test"
         }
 
         bookTime(availableTime).then((response) => {
