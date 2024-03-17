@@ -47,6 +47,7 @@ public class TireChangeService implements ManchesterServiceWorkshopInterface {
                         .map(Exception::new))
                 .bodyToFlux(TireChangeTime.class);
 
+        // TODO: Add filtering based on until date
         List<TireChangeTime> tireChangeTimeList = Objects.requireNonNull(tireChangeTime
                         .collectList()
                         .block())

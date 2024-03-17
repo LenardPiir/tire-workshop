@@ -3,6 +3,7 @@ package com.tire.workshop.collector.service;
 import com.tire.workshop.collector.WorkshopCollectorInterface;
 import com.tire.workshop.collector.domain.AvailableTime;
 import com.tire.workshop.collector.domain.Domain;
+import com.tire.workshop.collector.domain.Workshop;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -12,7 +13,7 @@ import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
-public class CollectorService {
+public class WorkshopCollectorService {
 
     private final List<WorkshopCollectorInterface> workshops;
 
@@ -54,5 +55,12 @@ public class CollectorService {
         domain.setAvailableTime(availableTimeList.get(0));
 
         return domain;
+    }
+
+    public List<Workshop> getWorkshops() {
+        return workshops
+                .stream()
+                .flatMap(workshop -> workshop.getWorkshops().stream())
+                .toList();
     }
 }
