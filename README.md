@@ -7,5 +7,7 @@ collects all workshops together. Currently there are 2 workshops (London and Man
 For further development: 
 1) Read workshop data into application by a file. Workshop data should be changable via metadata.
 2) Add integration tests to test external services and collector service
-3) Add customer session
-4) Handle edge case where two users are booking available time at the same time
+3) Display bookings in frontend by pages (for example if there are 20 available times then display them on two separate pages).
+4) Add customer session
+5) Handle edge case where two users are booking available time at the same time
+
