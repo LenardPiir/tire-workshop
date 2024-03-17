@@ -5,6 +5,7 @@ import {
     Container,
     CssBaseline,
     FormControl,
+    Grid,
     InputLabel,
     MenuItem,
     OutlinedInput,
@@ -17,7 +18,6 @@ import {
 } from "@mui/material";
 
 import dayjs, {Dayjs} from 'dayjs';
-import {DemoContainer} from '@mui/x-date-pickers/internals/demo';
 import {LocalizationProvider} from '@mui/x-date-pickers/LocalizationProvider';
 import {AdapterDayjs} from '@mui/x-date-pickers/AdapterDayjs';
 import {DatePicker} from "@mui/x-date-pickers";
@@ -48,23 +48,19 @@ function getStyles(name: string, personName: string[], theme: Theme) {
 export default function BookingComponent() {
     const theme = useTheme();
 
-    const [from, setFrom] = useState<Dayjs | null>(dayjs('2024-01-01'));
-    const [until, setUntil] = useState<Dayjs | null>(dayjs('2024-01-31'));
+    const [date, setDate] = useState(new Date());
+    const [from, setFrom] = useState<Dayjs | null>(dayjs(date));
+    const [until, setUntil] = useState<Dayjs | null>(dayjs(date));
     const [workshopName, setWorkshopName] = useState<string[]>([]);
     const [vehicleType, setVehicleType] = useState<string[]>([]);
-
     const [isWorkshopNameEmpty, setIsWorkshopNameEmpty] = useState<boolean>(false);
     const [isVehicleTypeEmpty, setIsVehicleTypeEmpty] = useState<boolean>(false);
-
     const [availableTimes, setAvailableTimes] = useState<AvailableTime[]>([]);
     const [selectedTime, setSelectedTime] = useState<AvailableTime>();
-
     const [successMessage, setSuccessMessage] = useState<boolean>(false);
     const [selectedTimeMissing, setSelectedTimeMissing] = useState<boolean>(false);
     const [noAvailableTimesFound, setNoAvailableTimesFound] = useState<boolean>(false);
-
     const [workshops, setWorkshops] = useState<Workshop[]>([]);
-
     const [selectorState, setSelectorState] = useState(-1);
 
     useEffect(() => {
@@ -76,6 +72,9 @@ export default function BookingComponent() {
     const getWorkshopsAvailableTimes = () => {
         getAvailableTimes(from?.format('YYYY-MM-DD'), until?.format('YYYY-MM-DD'), workshopName, vehicleType)
             .then((response) => {
+                if (response.data.availableTimes.length == 0) {
+                    setNoAvailableTimesFound(true);
+                }
                 setAvailableTimes(response.data.availableTimes)
             })
             .catch((error) => {
@@ -87,21 +86,26 @@ export default function BookingComponent() {
         return (
             <>{
                 availableTimes?.map((availableTime, index) =>
-                    <div key={availableTime.availableTimeId}>
-                        <Box
-                            height={50}
-                            width={500}
-                            my={4}
-                            display="flex"
-                            alignItems="center"
-                            gap={2}
-                            p={2}
-                            sx={{ border: '2px solid grey', backgroundColor: selectorState === index ? 'lightgreen' : '2px solid grey' }}
-                            onClick={() => handleSelect(availableTime, index)}
-                        >
-                            {availableTime.time}
-                        </Box>
-                    </div>
+                  <Grid item xs={2} sm={4} md={4} key={index}>
+                      <Box
+                          height={80}
+                          width={270}
+                          my={4}
+                          gap={2}
+                          p={2}
+                          sx={{
+                              border: '2px solid grey',
+                              backgroundColor: selectorState === index ? 'lightgreen' : '2px solid grey',
+                              maxWidth: 400,
+                              borderRadius: 1,
+                              display: 'flex',
+                              alignItems: 'flex-start',
+                          }}
+                          onClick={() => handleSelect(availableTime, index)}
+                      >
+                          {availableTime.time}
+                      </Box>
+                  </Grid>
                 )
             }</>
         )
@@ -149,6 +153,7 @@ export default function BookingComponent() {
         }
         if (selectedTime) {
             submitForm(selectedTime);
+            setSelectedTime(undefined);
         }
     }
 
@@ -197,7 +202,7 @@ export default function BookingComponent() {
     }
 
     return (
-        <Container component="main" maxWidth="sm">
+        <Container component="main" maxWidth="md">
             <CssBaseline />
             <Box
                 sx={{
@@ -207,15 +212,15 @@ export default function BookingComponent() {
                     alignItems: 'center',
                 }}
             >
-                <Box component="form" noValidate onSubmit={handleSearch} sx={{ mt: 3 }}>
-                    <Typography component="h1" variant="h5">
-                        Welcome to tire change booking system.
-                    </Typography>
+                <Typography component="h1" variant="h5">
+                    Welcome to tire change booking system.
+                </Typography>
 
-                    <Typography component="h1">
-                        Please select date for your booking and workshop you wish to visit.
-                    </Typography>
+                <Typography component="h1">
+                    Please select date for your booking and workshop you wish to visit.
+                </Typography>
 
+                <Box component="form" noValidate onSubmit={handleSearch} sx={{mt: 3}}>
                     <FormControl sx={{m: 1, width: 400}}>
                         <InputLabel
                             id="workshops"> Workshop
@@ -273,45 +278,60 @@ export default function BookingComponent() {
                         </Select>
                     </FormControl>
 
-                    <LocalizationProvider dateAdapter={AdapterDayjs}>
-                        <DemoContainer components={['DatePicker', 'DatePicker']}>
+                    <FormControl sx={{m: 1, width: 400}}>
+                        <LocalizationProvider dateAdapter={AdapterDayjs}>
                             <DatePicker
                                 name="from"
                                 label="From"
                                 value={from}
+                                minDate={dayjs(date)}
                                 onChange={(newValue) => setFrom(newValue)}
                             />
+                        </LocalizationProvider>
+                    </FormControl>
+
+                    <FormControl sx={{m: 1, width: 400}}>
+                        <LocalizationProvider dateAdapter={AdapterDayjs}>
                             <DatePicker
                                 name="until"
                                 label="Until"
                                 value={until}
+                                minDate={dayjs(date)}
                                 onChange={(newValue) => setUntil(newValue)}
                             />
-                        </DemoContainer>
-                    </LocalizationProvider>
+                        </LocalizationProvider>
+                    </FormControl>
 
-                    <Button
-                        type="submit"
-                        variant="contained"
-                        sx={{mt: 3, mb: 2}}
-                    >
-                        Search
-                    </Button>
-
-                    <DisplayAvailableTimes></DisplayAvailableTimes>
+                    <FormControl sx={{m: 1, width: 400, ml: 27}}>
+                        <Button
+                            type="submit"
+                            variant="contained"
+                            sx={{mt: 3, mb: 2}}
+                        >
+                            Search
+                        </Button>
+                    </FormControl>
                 </Box>
 
-                <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 3 }}>
+                <Box sx={{flexGrow: 1}}>
+                    <Grid container spacing={{xs: 2, md: 3}} columns={{xs: 4, sm: 8, md: 12}}>
+                        <DisplayAvailableTimes></DisplayAvailableTimes>
+                    </Grid>
+                </Box>
+
+                <Box component="form" noValidate onSubmit={handleSubmit} sx={{mt: 3}}>
                     <div>
                         {
                             availableTimes.length > 0 ?
-                                <Button
-                                    type="submit"
-                                    variant="contained"
-                                    sx={{mt: 3, mb: 2}}
-                                >
-                                    Book time
-                                </Button> : <div></div>
+                                <FormControl sx={{m: 1, width: 400, ml: 2}}>
+                                    <Button
+                                        type="submit"
+                                        variant="contained"
+                                        sx={{mt: 3, mb: 2}}
+                                    >
+                                        Book time
+                                    </Button>
+                                </FormControl> : <div></div>
                         }
                     </div>
 
