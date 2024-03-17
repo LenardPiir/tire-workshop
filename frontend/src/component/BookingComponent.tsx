@@ -70,7 +70,9 @@ export default function BookingComponent() {
     const [availableTimes, setAvailableTimes] = useState<AvailableTime[]>([]);
     const [selectedTime, setSelectedTime] = useState<AvailableTime>();
 
-    const [open, setOpen] = useState<boolean>(false);
+    const [successMessage, setSuccessMessage] = useState<boolean>(false);
+    const [selectedTimeMissing, setSelectedTimeMissing] = useState<boolean>(false);
+
 
     const getWorkshopsAvailableTimes = () => {
         getAvailableTimes(from?.format('YYYY-MM-DD'), until?.format('YYYY-MM-DD'), workshopName, vehicleType)
@@ -103,6 +105,13 @@ export default function BookingComponent() {
         )
     }
 
+    const handleSearch = (event: FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
+        const data = new FormData(event.currentTarget);
+
+        validateSearchForm(data);
+    };
+
     const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         const data = new FormData(event.currentTarget);
@@ -114,7 +123,7 @@ export default function BookingComponent() {
         setSelectedTime(availableTime);
     };
 
-    const validateForm = (data: FormData) => {
+    const validateSearchForm = (data: FormData) => {
         setIsWorkshopNameEmpty(false);
         setIsVehicleTypeEmpty(false);
 
@@ -124,7 +133,15 @@ export default function BookingComponent() {
         if (!data.get('vehicleTypes')) {
             setIsVehicleTypeEmpty(true);
         }
-        if (data.get('workshops') && data.get('vehicleTypes')/*&& data.get('selectedTime') */) {
+    }
+
+    const validateForm = (data: FormData) => {
+        setSelectedTimeMissing( false);
+
+        if (!selectedTime) {
+            setSelectedTimeMissing(true);
+        }
+        if (selectedTime) {
             submitForm(selectedTime);
         }
     }
@@ -139,7 +156,7 @@ export default function BookingComponent() {
         }
 
         bookTime(availableTime).then((response) => {
-            setOpen(true);
+            setSuccessMessage(true);
         });
     }
 
@@ -148,7 +165,8 @@ export default function BookingComponent() {
             return;
         }
 
-        setOpen(false);
+        setSuccessMessage(false);
+        setSelectedTimeMissing(false);
     };
 
     const handleWorkshopNameChange = (event: SelectChangeEvent<typeof workshopName>) => {
@@ -180,7 +198,7 @@ export default function BookingComponent() {
                     alignItems: 'center',
                 }}
             >
-                <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 3 }}>
+                <Box component="form" noValidate onSubmit={handleSearch} sx={{ mt: 3 }}>
                     <Typography component="h1" variant="h5">
                         Welcome to tire change booking system.
                     </Typography>
@@ -247,11 +265,13 @@ export default function BookingComponent() {
                     <LocalizationProvider dateAdapter={AdapterDayjs}>
                         <DemoContainer components={['DatePicker', 'DatePicker']}>
                             <DatePicker
+                                name="from"
                                 label="From"
                                 value={from}
                                 onChange={(newValue) => setFrom(newValue)}
                             />
                             <DatePicker
+                                name="until"
                                 label="Until"
                                 value={until}
                                 onChange={(newValue) => setUntil(newValue)}
@@ -260,6 +280,7 @@ export default function BookingComponent() {
                     </LocalizationProvider>
 
                     <Button
+                        type="submit"
                         variant="contained"
                         sx={{mt: 3, mb: 2}}
                         onClick={getWorkshopsAvailableTimes}
@@ -268,7 +289,9 @@ export default function BookingComponent() {
                     </Button>
 
                     <DisplayAvailableTimes></DisplayAvailableTimes>
+                </Box>
 
+                <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 3 }}>
                     <div>
                         {
                             availableTimes.length > 0 ?
@@ -282,7 +305,7 @@ export default function BookingComponent() {
                         }
                     </div>
 
-                    <Snackbar open={open} autoHideDuration={6000} onClose={handleClose}>
+                    <Snackbar open={successMessage} autoHideDuration={6000} onClose={handleClose}>
                         <Alert
                             onClose={handleClose}
                             severity="success"
@@ -293,6 +316,16 @@ export default function BookingComponent() {
                         </Alert>
                     </Snackbar>
 
+                    <Snackbar open={selectedTimeMissing} autoHideDuration={6000} onClose={handleClose}>
+                        <Alert
+                            onClose={handleClose}
+                            severity="error"
+                            variant="filled"
+                            sx={{ width: '100%' }}
+                        >
+                            Please select time to book.
+                        </Alert>
+                    </Snackbar>
                 </Box>
             </Box>
         </Container>
