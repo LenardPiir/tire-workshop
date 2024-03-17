@@ -21,9 +21,9 @@ import {DemoContainer} from '@mui/x-date-pickers/internals/demo';
 import {LocalizationProvider} from '@mui/x-date-pickers/LocalizationProvider';
 import {AdapterDayjs} from '@mui/x-date-pickers/AdapterDayjs';
 import {DatePicker} from "@mui/x-date-pickers";
-import React, {FormEvent, useState} from "react";
-import {bookTime, getAvailableTimes} from "../service/BookingService";
-import {AvailableTime} from "../interface/BookingTypes";
+import React, {FormEvent, useEffect, useState} from "react";
+import {bookTime, getAvailableTimes, getWorkshops} from "../service/BookingService";
+import {AvailableTime, Workshop} from "../interface/BookingTypes";
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
@@ -45,17 +45,6 @@ function getStyles(name: string, personName: string[], theme: Theme) {
     };
 }
 
-// TODO: get data from backend
-const workshops = [
-    'London',
-    'Manchester'
-];
-
-const vehicleTypes = [
-    'Sõiduauto',
-    'Veoauto'
-];
-
 export default function BookingComponent() {
     const theme = useTheme();
 
@@ -72,19 +61,32 @@ export default function BookingComponent() {
 
     const [successMessage, setSuccessMessage] = useState<boolean>(false);
     const [selectedTimeMissing, setSelectedTimeMissing] = useState<boolean>(false);
+    const [noAvailableTimesFound, setNoAvailableTimesFound] = useState<boolean>(false);
 
+    const [workshops, setWorkshops] = useState<Workshop[]>([]);
+
+    const [state, setState] = useState(-1);
+
+    useEffect(() => {
+        getWorkshops().then((response) => {
+            setWorkshops(response.data)
+        });
+    }, []);
 
     const getWorkshopsAvailableTimes = () => {
         getAvailableTimes(from?.format('YYYY-MM-DD'), until?.format('YYYY-MM-DD'), workshopName, vehicleType)
             .then((response) => {
                 setAvailableTimes(response.data.availableTimes)
             })
+            .catch((error) => {
+                setNoAvailableTimesFound(true);
+            })
     }
 
     function DisplayAvailableTimes() {
         return (
             <>{
-                availableTimes?.map((availableTime) =>
+                availableTimes?.map((availableTime, index) =>
                     <div key={availableTime.availableTimeId}>
                         <Box
                             height={50}
@@ -94,8 +96,8 @@ export default function BookingComponent() {
                             alignItems="center"
                             gap={2}
                             p={2}
-                            sx={{ border: '2px solid grey' }}
-                            onClick={() => handleSelect(availableTime)}
+                            sx={{ border: '2px solid grey', backgroundColor: state === index ? 'aliceblue' : '2px solid grey' }}
+                            onClick={() => handleSelect(availableTime, index)}
                         >
                             {availableTime.time}
                         </Box>
@@ -116,10 +118,11 @@ export default function BookingComponent() {
         event.preventDefault();
         const data = new FormData(event.currentTarget);
 
-        validateForm(data);
+        validateSelectForm(data);
     };
 
-    const handleSelect = (availableTime: AvailableTime) => {
+    const handleSelect = (availableTime: AvailableTime, index: any) => {
+        setState(index);
         setSelectedTime(availableTime);
     };
 
@@ -138,7 +141,7 @@ export default function BookingComponent() {
         }
     }
 
-    const validateForm = (data: FormData) => {
+    const validateSelectForm = (data: FormData) => {
         setSelectedTimeMissing( false);
 
         if (!selectedTime) {
@@ -168,6 +171,7 @@ export default function BookingComponent() {
             return;
         }
 
+        setNoAvailableTimesFound(false);
         setSuccessMessage(false);
         setSelectedTimeMissing(false);
     };
@@ -226,13 +230,13 @@ export default function BookingComponent() {
                             input={<OutlinedInput label="Name"/>}
                             MenuProps={MenuProps}
                         >
-                            {workshops.map((name) => (
+                            {workshops.map((workshop) => (
                                 <MenuItem
-                                    key={name}
-                                    value={name}
-                                    style={getStyles(name, workshopName, theme)}
+                                    key={workshop.name}
+                                    value={workshop.name}
+                                    style={getStyles(workshop.name, workshopName, theme)}
                                 >
-                                    {name}
+                                    {workshop.name}
                                 </MenuItem>
                             ))}
                         </Select>
@@ -253,14 +257,16 @@ export default function BookingComponent() {
                             input={<OutlinedInput label="Name2"/>}
                             MenuProps={MenuProps}
                         >
-                            {vehicleTypes.map((name) => (
-                                <MenuItem
-                                    key={name}
-                                    value={name}
-                                    style={getStyles(name, workshopName, theme)}
-                                >
-                                    {name}
-                                </MenuItem>
+                            {workshops.map((workshop) => (
+                                workshop.vehicleType.map((vehicleType) =>
+                                    <MenuItem
+                                        key={vehicleType.type}
+                                        value={vehicleType.type}
+                                        style={getStyles(vehicleType.type, workshopName, theme)}
+                                    >
+                                        {vehicleType.type}
+                                    </MenuItem>
+                                )
                             ))}
                         </Select>
                     </FormControl>
@@ -326,6 +332,17 @@ export default function BookingComponent() {
                             sx={{ width: '100%' }}
                         >
                             Please select time to book.
+                        </Alert>
+                    </Snackbar>
+
+                    <Snackbar open={noAvailableTimesFound} autoHideDuration={6000} onClose={handleClose}>
+                        <Alert
+                            onClose={handleClose}
+                            severity="error"
+                            variant="filled"
+                            sx={{ width: '100%' }}
+                        >
+                            No available times in selected date range.
                         </Alert>
                     </Snackbar>
                 </Box>
