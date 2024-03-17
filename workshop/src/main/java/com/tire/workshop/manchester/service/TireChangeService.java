@@ -92,10 +92,7 @@ public class TireChangeService implements ManchesterServiceWorkshopInterface {
     }
 
     public AvailableTime bookTireChangeTime(AvailableTime availableTime) {
-        // TODO: Use solution universally
-        ObjectMapper mapper = new ObjectMapper();
-        ObjectNode contactInformation = mapper.createObjectNode();
-        contactInformation.put("contactInformation", availableTime.getContactInformation());
+        ObjectNode contactInformation = getJsonNode(availableTime);
 
         WebClient webClient = WebClient.create(url + "/" + availableTime.getAvailableTimeId() + "/booking");
 
@@ -109,8 +106,15 @@ public class TireChangeService implements ManchesterServiceWorkshopInterface {
                 .bodyToMono(TireChangeTime.class).block();
 
         return new AvailableTime(String.valueOf(tireChangeTime.getId()),
-                availableTime.getTime(),
+                String.valueOf(tireChangeTime.getTime()),
                 availableTime.getWorkshop(),
                 availableTime.getContactInformation());
+    }
+
+    private static ObjectNode getJsonNode(AvailableTime availableTime) {
+        ObjectMapper mapper = new ObjectMapper();
+        ObjectNode contactInformation = mapper.createObjectNode();
+        contactInformation.put("contactInformation", availableTime.getContactInformation());
+        return contactInformation;
     }
 }

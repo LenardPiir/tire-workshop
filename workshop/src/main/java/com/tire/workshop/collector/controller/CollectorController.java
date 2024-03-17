@@ -23,7 +23,7 @@ public class CollectorController {
         return collectorService.getAvailableTimes(from, until, workshopNames, vehicleTypes);
     }
 
-    @PostMapping("/book-time")
+    @PutMapping("/book-time")
     public @ResponseBody Domain bookTime(@RequestBody AvailableTime availableTime) {
         return collectorService.bookTireChangeTime(availableTime);
     }

@@ -4,6 +4,7 @@ import com.tire.workshop.collector.domain.AvailableTime;
 import com.tire.workshop.collector.domain.VehicleType;
 import com.tire.workshop.collector.domain.Workshop;
 import com.tire.workshop.london.LondonServiceWorkshopInterface;
+import com.tire.workshop.london.data.TireChangeBookingRequest;
 import com.tire.workshop.london.data.TireChangeBookingResponse;
 import com.tire.workshop.london.data.TireChangeTimesResponse;
 import lombok.RequiredArgsConstructor;
@@ -71,22 +72,25 @@ public class TireChangeService implements LondonServiceWorkshopInterface {
     }
 
     public AvailableTime bookTireChangeTime(AvailableTime availableTime) {
+        TireChangeBookingRequest tireChangeBookingRequest = new TireChangeBookingRequest("test");
+
         TireChangeBookingResponse tireChangeBookingResponse = webClient.put()
                 .uri(uriBuilder -> uriBuilder
                         .path(String.valueOf(availableTime.getAvailableTimeId()))
                         .path("/booking")
                         .build())
-                .body(BodyInserters.fromValue(availableTime.getContactInformation()))
+                .body(BodyInserters.fromValue(tireChangeBookingRequest))
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_XML_VALUE)
                 .accept(MediaType.APPLICATION_XML)
                 .retrieve()
+                // TODO: add onStatus for general exception handling
                 .onStatus(
                         HttpStatus.UNPROCESSABLE_ENTITY::equals,
                         response -> response.bodyToMono(String.class).map(Exception::new))
                 .bodyToMono(TireChangeBookingResponse.class).block();
 
         return new AvailableTime(String.valueOf(tireChangeBookingResponse.getUuid()),
-                availableTime.getTime(),
+                tireChangeBookingResponse.getTime(),
                 availableTime.getWorkshop(),
                 availableTime.getContactInformation());
     }
