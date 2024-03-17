@@ -88,7 +88,7 @@ export default function BookingComponent() {
                 availableTimes?.map((availableTime, index) =>
                   <Grid item xs={2} sm={4} md={4} key={index}>
                       <Box
-                          height={80}
+                          height={140}
                           width={270}
                           my={4}
                           gap={2}
@@ -103,7 +103,18 @@ export default function BookingComponent() {
                           }}
                           onClick={() => handleSelect(availableTime, index)}
                       >
-                          {availableTime.time}
+                          <div>
+                              {availableTime.time}
+                              <div>
+                                  {availableTime.workshop.name}
+                              </div>
+                              <div>
+                                  {availableTime.workshop.address}
+                              </div>
+                              <div>
+                                  {availableTime.workshop.vehicleType.map((vehicleType) => vehicleType.type)}
+                              </div>
+                          </div>
                       </Box>
                   </Grid>
                 )

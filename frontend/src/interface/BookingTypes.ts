@@ -1,7 +1,7 @@
 export interface AvailableTime {
     availableTimeId: string,
     time: string,
-    workshop: Workshop[],
+    workshop: Workshop,
     contactInformation: string;
 }
 
