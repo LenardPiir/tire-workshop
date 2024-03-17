@@ -34,6 +34,9 @@ public class TireChangeService implements LondonServiceWorkshopInterface {
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_XML_VALUE)
                 .accept(MediaType.APPLICATION_XML)
                 .retrieve()
+                .onStatus(HttpStatus.INTERNAL_SERVER_ERROR::equals, response -> response
+                        .bodyToMono(String.class)
+                        .map(Exception::new))
                 .bodyToMono(TireChangeTimesResponse.class).block();
 
         return tireChangeTimesResponse.getAvailableTime()
@@ -72,7 +75,7 @@ public class TireChangeService implements LondonServiceWorkshopInterface {
     }
 
     public AvailableTime bookTireChangeTime(AvailableTime availableTime) {
-        TireChangeBookingRequest tireChangeBookingRequest = new TireChangeBookingRequest("test");
+        TireChangeBookingRequest tireChangeBookingRequest = new TireChangeBookingRequest(availableTime.getContactInformation());
 
         TireChangeBookingResponse tireChangeBookingResponse = webClient.put()
                 .uri(uriBuilder -> uriBuilder
@@ -83,7 +86,6 @@ public class TireChangeService implements LondonServiceWorkshopInterface {
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_XML_VALUE)
                 .accept(MediaType.APPLICATION_XML)
                 .retrieve()
-                // TODO: add onStatus for general exception handling
                 .onStatus(
                         HttpStatus.UNPROCESSABLE_ENTITY::equals,
                         response -> response.bodyToMono(String.class).map(Exception::new))

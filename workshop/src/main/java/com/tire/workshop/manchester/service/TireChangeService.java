@@ -35,7 +35,6 @@ public class TireChangeService implements ManchesterServiceWorkshopInterface {
 
         WebClient webClient = WebClient.create(url);
 
-        // TODO: add onError?
         Flux<TireChangeTime> tireChangeTime = webClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .queryParam("amount", amount)
@@ -43,6 +42,9 @@ public class TireChangeService implements ManchesterServiceWorkshopInterface {
                         .queryParam("from", from)
                         .build())
                 .retrieve()
+                .onStatus(HttpStatus.INTERNAL_SERVER_ERROR::equals, response -> response
+                        .bodyToMono(String.class)
+                        .map(Exception::new))
                 .bodyToFlux(TireChangeTime.class);
 
         List<TireChangeTime> tireChangeTimeList = Objects.requireNonNull(tireChangeTime
