@@ -65,7 +65,7 @@ export default function BookingComponent() {
 
     const [workshops, setWorkshops] = useState<Workshop[]>([]);
 
-    const [state, setState] = useState(-1);
+    const [selectorState, setSelectorState] = useState(-1);
 
     useEffect(() => {
         getWorkshops().then((response) => {
@@ -96,7 +96,7 @@ export default function BookingComponent() {
                             alignItems="center"
                             gap={2}
                             p={2}
-                            sx={{ border: '2px solid grey', backgroundColor: state === index ? 'aliceblue' : '2px solid grey' }}
+                            sx={{ border: '2px solid grey', backgroundColor: selectorState === index ? 'lightgreen' : '2px solid grey' }}
                             onClick={() => handleSelect(availableTime, index)}
                         >
                             {availableTime.time}
@@ -122,7 +122,7 @@ export default function BookingComponent() {
     };
 
     const handleSelect = (availableTime: AvailableTime, index: any) => {
-        setState(index);
+        setSelectorState(index);
         setSelectedTime(availableTime);
     };
 
@@ -163,6 +163,8 @@ export default function BookingComponent() {
 
         bookTime(availableTime).then((response) => {
             setSuccessMessage(true);
+            getWorkshopsAvailableTimes();
+            setSelectorState(-1);
         });
     }
 
