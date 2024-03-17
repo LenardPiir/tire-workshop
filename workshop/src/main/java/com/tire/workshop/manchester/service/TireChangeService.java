@@ -108,6 +108,7 @@ public class TireChangeService implements ManchesterServiceWorkshopInterface {
                         response -> response.bodyToMono(String.class).map(Exception::new))
                 .bodyToMono(TireChangeTime.class).block();
 
+        // TODO: fix nullpointer cause
         return new AvailableTime(String.valueOf(tireChangeTime.getId()),
                 String.valueOf(tireChangeTime.getTime()),
                 availableTime.getWorkshop(),

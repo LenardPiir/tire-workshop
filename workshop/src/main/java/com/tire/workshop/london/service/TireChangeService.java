@@ -39,6 +39,7 @@ public class TireChangeService implements LondonServiceWorkshopInterface {
                         .map(Exception::new))
                 .bodyToMono(TireChangeTimesResponse.class).block();
 
+        // TODO: fix nullpointer cause
         return tireChangeTimesResponse.getAvailableTime()
                 .stream()
                 .map(availableTime -> AvailableTime
@@ -91,6 +92,7 @@ public class TireChangeService implements LondonServiceWorkshopInterface {
                         response -> response.bodyToMono(String.class).map(Exception::new))
                 .bodyToMono(TireChangeBookingResponse.class).block();
 
+        // TODO: fix nullpointer cause
         return new AvailableTime(String.valueOf(tireChangeBookingResponse.getUuid()),
                 tireChangeBookingResponse.getTime(),
                 availableTime.getWorkshop(),
