@@ -133,6 +133,9 @@ export default function BookingComponent() {
         if (!data.get('vehicleTypes')) {
             setIsVehicleTypeEmpty(true);
         }
+        if (data.get('workshops') && data.get('vehicleTypes')) {
+            getWorkshopsAvailableTimes();
+        }
     }
 
     const validateForm = (data: FormData) => {
@@ -283,7 +286,6 @@ export default function BookingComponent() {
                         type="submit"
                         variant="contained"
                         sx={{mt: 3, mb: 2}}
-                        onClick={getWorkshopsAvailableTimes}
                     >
                         Search
                     </Button>
